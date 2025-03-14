@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { RENDER_PATH } from "./common/constants";
 import LoginContainer from "./components/loginContainer";
 import SignupContainer from "./components/SignUpContainer";
-import LandingContainer from "./components/landingContainer";
+import LandingContainer from "./components/LandingContainer";
 import QRGenerator from "./components/QRGenerator";
 function App() {
   return (
