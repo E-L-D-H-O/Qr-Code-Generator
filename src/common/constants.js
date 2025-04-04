@@ -3,6 +3,6 @@ export const RENDER_PATH = {
     LOGIN_URL: "/login",
     SIGN_UP_URL: "/signup",
     CREATE_QR_URL: "/createqr",
-    MY_ACCOUNT_URL: "/dashboard",
+    DASHBOARD: "/dashboard",
     SUCCESS: "/success"
 }

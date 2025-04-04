@@ -10,9 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+<<<<<<< HEAD
     "primereact": "^10.9.4",
+=======
+    "bootstrap": "^5.3.3",
+    "primereact": "^10.9.3",
+>>>>>>> b7c6c2bfa8d3eb920e332871f690da8b1fa8c4ee
     "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0"
   },
