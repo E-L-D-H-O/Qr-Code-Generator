@@ -30,24 +30,6 @@
     padding: 2rem;
 }
 
-.form-container {
-    padding: 2rem;
-}
-
-.form-container h2 {
-    font-weight: bold;
-    color: #0056b3;
-}
-
-.btnSignUp {
-    background-color: #0056b3;
-    color: white;
-}
-
-.btnSignUp:hover {
-    background-color: #007bff;
-    color: white;
-}
 
 footer {
     background: #343a40;
@@ -104,25 +86,6 @@ footer {
     color: #555;
 }
 
-.btn {
-    display: inline-block;
-    padding: 0.8rem 2rem;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(86, 100, 210, 0.3);
-}
-
-.btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(86, 100, 210, 0.4);
-}
 
 .generator {
     background-color: white;
@@ -456,6 +419,8 @@ footer {
     color: rgba(255, 255, 255, 0.6);
 }
 
+
+
 @media (max-width: 768px) {
     .hero {
         flex-direction: column;
@@ -486,193 +451,60 @@ footer {
     }
 }
 
-/* QRGenerator CSS */
 
-:root {
-    --primary-color: #007bff;       /* Main accent color */
-    --secondary-color: #ffffff;     /* Light text on primary backgrounds */
-    --hover-color: #0056b3;         /* Darker accent for hover effects */
-    --bg-color: #ffffff;            /* Page background */
-    --text-color: #333333;          /* Primary text color */
-    --font-family: 'Roboto', sans-serif;
-}
 
-/* QR Generator Section */
-.qr-generator {
-    flex: 1;
-    width: 100%;
-    background-color: var(--bg-color);
-    padding: 5px;
-}
+/* dashboard css */
 
-/* Two-column Layout for QR Generator */
+
 .qr-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
+    margin-top: 30px;
 }
 
-/* Left Panel: Grid and Input Field */
-.left-panel {
-    width: 40%;
+.qr-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.qr-types-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);  /* 2 columns for a 2x3 grid */
-    grid-gap: 15px;
-    margin-bottom: 20px;
-}
-
-.qr-types-grid button {
-    border: none;
-    background-color: #eee;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-size: 1.1rem;
-    text-align: center;
-    aspect-ratio: 3 / 1; 
-}
-  
-.qr-types-grid button:hover,
-.qr-types-grid button.active {
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-}
-
-/* Input & Button under the Grid */
-.qr-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.qr-input-group input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-.qr-input-group button {
-    padding: 10px 20px;
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-size: 1rem;
-}
-  
-.qr-input-group button:hover {
-    background-color: var(--hover-color);
-}
-
-/* Right Panel: Phone Display */
-.phone-display {
-    width: 60%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Phone Frame Styling */
-.phone-frame {
-    margin-top: 40px;
-    width: 300px;
-    height: 600px;
-    border: 16px solid ;
-    border-radius: 36px;
-    background: var(--secondary-color);
-    box-shadow: 0 0 0 8px #ccc;
-}
-
-/* Phone Screen where QR is rendered */
-.phone-screen {
-    border-radius: 16px;
-    width: 100%;
-    height: 100%;
-    background: #f8f9fc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Navbar Styling */
-.navbar {
-    width: 100%;
-    background-color: var(--primary-color);
-    color: var(--secondary-color);
-    padding: 10px 20px;
-}
-  
-.navbar h1 {
-    font-size: 1.8rem;
-}
-  
-.navbar .account {
-    font-size: 1rem;
-}
-
-/* Footer Styling */
-.footer {
-    height: 70px;
-    width: 100%;
-    background-color: #343a40;
-    color: #ffffff;
-    padding: 10px 20px;  
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     text-align: center;
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .qr-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .left-panel,
-    .phone-display {
-        width: 90%;
-        padding: 10px;
-        margin: 0 auto;
-    }
-    
-    .phone-frame {
-        width: 250px;
-        height: 500px;
-        margin-top: 20px;
-    }
-    
-    .navbar h1 {
-        font-size: 1.6rem;
-    }
+.qr-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
-@media (max-width: 480px) {
-    .navbar h1 {
-        font-size: 1.4rem;
-    }
-    
-    .qr-types-grid button {
-        font-size: 0.9rem;
-        padding: 8px;
-    }
-    
-    .qr-input-group input,
-    .qr-input-group button {
-        font-size: 0.9rem;
-        padding: 8px;
-    }
-    
-    .phone-frame {
-        width: 200px;
-        height: 400px;
-    }
+.qr-preview-img img {
+    width: 100%;
+    max-width: 160px;
+    border-radius: 10px;
+    padding: 12px;
+    background: white;
+    transition: transform 0.3s ease-in-out;
+}
+
+.qr-card:hover .qr-preview img {
+    transform: scale(1.05);
+}
+
+.btn-3d {
+    background: linear-gradient(145deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+    transition: all 0.3s ease-in-out;
+    margin-top: 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 50px;
+}
+
+.btn-3d:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(255, 75, 43, 0.5);
+}
+
+.btn-3d i {
+    margin-right: 5px;
 }
