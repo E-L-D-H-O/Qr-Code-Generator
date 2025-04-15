@@ -11,5 +11,5 @@ export const RENDER_PATH = {
 }
 
 export const API_URL = {
-    BASE_URL: 'http://localhost:5000',
+    BASE_URL: 'http://ec2-18-223-211-176.us-east-2.compute.amazonaws.com:5000',
 }
