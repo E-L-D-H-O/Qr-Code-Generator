@@ -13,7 +13,6 @@ const Navbar = () => {
         }
     }, []);
 
-    console.log("usr", user);
     const handleLogout = () => {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
