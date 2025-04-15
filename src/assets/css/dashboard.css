@@ -1,0 +1,55 @@
+/* dashboard css */
+
+
+.qr-container {
+    margin-top: 30px;
+}
+
+.qr-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    text-align: center;
+}
+
+.qr-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.qr-preview-img img {
+    width: 100%;
+    max-width: 160px;
+    border-radius: 10px;
+    padding: 12px;
+    background: white;
+    transition: transform 0.3s ease-in-out;
+}
+
+.qr-card:hover .qr-preview img {
+    transform: scale(1.05);
+}
+
+.btn-3d {
+    background: linear-gradient(145deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+    transition: all 0.3s ease-in-out;
+    margin-top: 10px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 50px;
+}
+
+.btn-3d:hover {
+    transform: scale(1.08);
+    box-shadow: 0 8px 25px rgba(255, 75, 43, 0.5);
+}
+
+.btn-3d i {
+    margin-right: 5px;
+}
