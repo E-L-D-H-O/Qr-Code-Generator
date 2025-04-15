@@ -1,348 +1,390 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
+import { Button, Card, Form, Row, Col, Alert, Spinner } from "react-bootstrap";
+import Toast from "react-bootstrap/Toast";
+import ToastContainer from "react-bootstrap/ToastContainer";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import { motion } from "framer-motion";
+import { ArrowLeftCircle } from "lucide-react";
+import { API_URL } from "../common/constants";
 
 const QRGenerator = () => {
   const [qrType, setQrType] = useState("URL");
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
-  const qrRef = useRef(null);
+  const [showQR, setShowQR] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const navigate = useNavigate();
 
   const qrTypes = ["URL", "Text", "Email", "Phone", "WiFi", "Event"];
 
-  // Validate user input based on QR type and update errorMessage state
   const validateInput = () => {
     switch (qrType) {
-      case "URL":
-        try {
-          new URL(formData.data);
-          setErrorMessage("");
-          return true;
-        } catch (err) {
-          setErrorMessage("Please enter a valid URL.");
+      case "URL": {
+        const url = formData.data?.trim();
+        const urlRegex = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/i;
+
+
+        if (!url || !urlRegex.test(url)) {
+          setErrorMessage("Please enter a valid URL (must include domain name).");
           return false;
         }
+
+        try {
+          new URL(url.startsWith("http") ? url : `https://${url}`);
+          return true;
+        } catch {
+          setErrorMessage("Invalid URL format.");
+          return false;
+        }
+      }
+
       case "Text":
-        if (!formData.data || formData.data.trim() === "") {
+        if (!formData.data?.trim()) {
           setErrorMessage("Please enter text data.");
           return false;
         }
-        setErrorMessage("");
         return true;
+
       case "Email": {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(formData.email || "")) {
           setErrorMessage("Please enter a valid email address.");
           return false;
         }
-        setErrorMessage("");
         return true;
       }
-      case "Phone": {
-        const phoneRegex = /^\+?[0-9\s-]{7,15}$/;
-        if (!formData.contactName || formData.contactName.trim() === "") {
+
+      case "Phone":
+        if (!formData.contactName?.trim()) {
           setErrorMessage("Please enter a contact name.");
           return false;
         }
-        if (!phoneRegex.test(formData.phone || "")) {
-          setErrorMessage("Please enter a valid phone number.");
+        if (!/^\+?[0-9\s-]{7,15}$/.test(formData.phone || "")) {
+          setErrorMessage("Please enter a valid phone number (7-15 digits).");
           return false;
         }
-        setErrorMessage("");
         return true;
-      }
+
       case "WiFi": {
-        if (!formData.ssid || formData.ssid.trim() === "") {
-          setErrorMessage("Please enter the SSID.");
+        const { ssid, encryption = "WPA", password } = formData;
+
+        if (!ssid || ssid.trim().length === 0) {
+          setErrorMessage("SSID is required.");
           return false;
         }
-        if ((formData.encryption || "WPA") !== "nopass" && (!formData.password || formData.password.trim() === "")) {
-          setErrorMessage("Please enter the WiFi password.");
+
+        if (!["WPA", "WEP", "nopass"].includes(encryption)) {
+          setErrorMessage("Invalid encryption type.");
           return false;
         }
-        setErrorMessage("");
+
+        if (
+          encryption !== "nopass" &&
+          (!password || password.length < 8 || password.length > 64)
+        ) {
+          setErrorMessage("Password must be between 8 and 64 characters.");
+          return false;
+        }
+
         return true;
       }
+
       case "Event": {
-        if (!formData.title || formData.title.trim() === "") {
-          setErrorMessage("Please enter the event title.");
-          return false;
-        }
-        // Validate dates using DD/MM/YYYY format
         const dateRegex = /^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/\d{4}$/;
-        if (!dateRegex.test(formData.start || "")) {
-          setErrorMessage("Please enter a valid start date (DD/MM/YYYY).");
+        const { title, start, end } = formData;
+
+        if (!title?.trim() || !dateRegex.test(start || "") || !dateRegex.test(end || "")) {
+          setErrorMessage("Please enter a valid title and dates in DD/MM/YYYY format.");
           return false;
         }
-        if (!dateRegex.test(formData.end || "")) {
-          setErrorMessage("Please enter a valid end date (DD/MM/YYYY).");
+
+        const [startDay, startMonth, startYear] = start.split("/").map(Number);
+        const [endDay, endMonth, endYear] = end.split("/").map(Number);
+        const startDate = new Date(startYear, startMonth - 1, startDay);
+        const endDate = new Date(endYear, endMonth - 1, endDay);
+
+        if (startDate > endDate) {
+          setErrorMessage("End date cannot be before start date.");
           return false;
         }
-        setErrorMessage("");
+
         return true;
       }
+
       default:
-        setErrorMessage("");
         return true;
     }
   };
 
-  // Download QR code only if inputs are valid
-  const downloadQRCode = () => {
-    if (!validateInput()) {
-      return;
-    }
-    const canvas = qrRef.current.querySelector("canvas");
-    const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-    const link = document.createElement("a");
-    link.href = image;
-    link.download = "QRCode.png";
-    link.click();
+  const escapeQR = (val = "") =>
+    val.replace(/([;,:\\"])/g, "\\$1");
+
+
+  const formatDate = (dateStr) => {
+    const [day, month, year] = dateStr.split("/").map(Number);
+    if (!day || !month || !year) return "";
+    return `${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}`;
   };
 
-  // Generate the QR code value based on type and form data
   const getQRValue = () => {
     switch (qrType) {
       case "URL":
       case "Text":
         return formData.data || "";
       case "Email":
-        return `mailto:${formData.email || ""}?subject=${encodeURIComponent(
-          formData.subject || ""
-        )}&body=${encodeURIComponent(formData.body || "")}`;
+        return `mailto:${escapeQR(formData.email)}?subject=${encodeURIComponent(formData.subject || "")}&body=${encodeURIComponent(formData.body || "")}`;
       case "Phone":
-        // MECARD format for contacts
-        return `MECARD:N:${formData.contactName || ""};TEL:${formData.phone || ""};;`;
-      case "WiFi":
-        return `WIFI:T:${formData.encryption || "WPA"};S:${
-          formData.ssid || ""
-        };P:${formData.password || ""};H:${
-          formData.hidden ? "true" : "false"
-        };;`;
-      case "Event":
-        return `BEGIN:VEVENT
-SUMMARY:${formData.title || ""}
-DTSTART:${formData.start || ""}
-DTEND:${formData.end || ""}
-LOCATION:${formData.location || ""}
-DESCRIPTION:${formData.description || ""}
-END:VEVENT`;
+        return `MECARD:N:${escapeQR(formData.contactName)};TEL:${escapeQR(formData.phone)};;`;
+      case "WiFi": {
+        const { ssid, encryption = "WPA", password = "", hidden = false } = formData;
+        const escapedSSID = escapeQR(ssid);
+        const escapedPassword = escapeQR(password);
+        const hiddenFlag = hidden ? "true" : "false";
+
+        return `WIFI:T:${encryption};S:${escapedSSID};P:${escapedPassword};H:${hiddenFlag};;`;
+      }
+      case "Event": {
+        const formatDate = (dateStr) => {
+          const [day, month, year] = dateStr.split("/");
+          return `${year}${month.padStart(2, "0")}${day.padStart(2, "0")}T000000`;
+        };
+        return `BEGIN:VEVENT\nSUMMARY:${escapeQR(formData.title)}\nDTSTART:${formatDate(formData.start)}\nDTEND:${formatDate(formData.end)}\nLOCATION:${escapeQR(formData.location)}\nDESCRIPTION:${escapeQR(formData.description)}\nEND:VEVENT`;
+      }
       default:
         return "";
     }
   };
 
-  // Render input fields based on selected QR type
+
+  const handleCreateQRCode = () => {
+    if (!validateInput()) return;
+
+    setErrorMessage("");
+    setLoading(true);
+    setShowToast(true);
+
+    // Show QR after 1s loading
+    setTimeout(() => {
+      setShowQR(true);
+      setLoading(false);
+    }, 1000);
+
+    // Redirect after 5 seconds
+    setTimeout(() => {
+      navigate("/success", { state: { qrValue: getQRValue() } });
+    }, 5000);
+
+    // ✅ Call the save function
+    saveQRCodeToDB();
+  };
+
+  const saveQRCodeToDB = async () => {
+    try {
+      const response = await fetch(`${API_URL.BASE_URL}/create-qr`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          type: qrType,
+          data: getQRValue(), // ✅ must match backend expectations
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save QR code.");
+
+      console.log("QR code saved successfully.");
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+
+
+  const renderInput = (label, placeholder, value, key, type = "text") => (
+    <Form.Group controlId={key}>
+      <Form.Label>{label}</Form.Label>
+      <Form.Control
+        type={type}
+        placeholder={placeholder}
+        value={value || ""}
+        onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+        className="p-3 rounded-3 shadow-sm border-0"
+      />
+    </Form.Group>
+  );
+
+  const renderTextarea = (label, placeholder, value, key) => (
+    <Form.Group controlId={key}>
+      <Form.Label>{label}</Form.Label>
+      <Form.Control
+        as="textarea"
+        placeholder={placeholder}
+        value={value || ""}
+        onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+        className="p-3 rounded-3 shadow-sm border-0"
+      />
+    </Form.Group>
+  );
+
   const renderInputFields = () => {
     switch (qrType) {
       case "WiFi":
         return (
-          <div className="wifi-inputs">
-            <label>
-              SSID:
-              <input
-                type="text"
-                placeholder="SSID"
-                value={formData.ssid || ""}
-                onChange={(e) => setFormData({ ...formData, ssid: e.target.value })}
-              />
-            </label>
-            <label>
-              Encryption:
-              <select
-                value={formData.encryption || "WPA"}
-                onChange={(e) => setFormData({ ...formData, encryption: e.target.value })}
-              >
-                <option value="WPA">WPA/WPA2</option>
-                <option value="WEP">WEP</option>
-                <option value="nopass">None</option>
-              </select>
-            </label>
-            <label>
-              Password:
-              <input
-                type="text"
-                placeholder="Password"
-                value={formData.password || ""}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-            </label>
-            <label>
-              Hidden:
-              <input
-                type="checkbox"
-                checked={formData.hidden || false}
-                onChange={(e) => setFormData({ ...formData, hidden: e.target.checked })}
-              />
-            </label>
-          </div>
+          <>
+            {renderInput("SSID", "Enter WiFi SSID", formData.ssid, "ssid")}
+            <Form.Label>Encryption</Form.Label>
+            <Form.Control
+              as="select"
+              value={formData.encryption || "WPA"}
+              onChange={(e) => setFormData({ ...formData, encryption: e.target.value })}
+              className="p-3 rounded-3 shadow-sm border-0"
+            >
+              <option value="WPA">WPA/WPA2</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">None</option>
+            </Form.Control>
+            {renderInput("Password", "Enter Password", formData.password, "password")}
+            <Form.Check
+              type="checkbox"
+              label="Hidden Network"
+              checked={formData.hidden || false}
+              onChange={(e) => setFormData({ ...formData, hidden: e.target.checked })}
+              className="mt-2"
+            />
+          </>
         );
       case "Email":
         return (
-          <div className="email-inputs">
-            <label>
-              Recipient Email:
-              <input
-                type="email"
-                placeholder="Recipient Email"
-                value={formData.email || ""}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </label>
-            <label>
-              Subject:
-              <input
-                type="text"
-                placeholder="Subject"
-                value={formData.subject || ""}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              />
-            </label>
-            <label>
-              Body:
-              <textarea
-                placeholder="Body"
-                value={formData.body || ""}
-                onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-              />
-            </label>
-          </div>
+          <>
+            {renderInput("Email Address", "Enter email", formData.email, "email")}
+            {renderInput("Subject", "Enter subject", formData.subject, "subject")}
+            {renderTextarea("Body", "Enter email body", formData.body, "body")}
+          </>
         );
       case "Phone":
         return (
-          <div className="phone-inputs">
-            <label>
-              Contact Name:
-              <input
-                type="text"
-                placeholder="Contact Name"
-                value={formData.contactName || ""}
-                onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-              />
-            </label>
-            <label>
-              Phone Number:
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={formData.phone || ""}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </label>
-          </div>
+          <>
+            {renderInput("Contact Name", "Enter name", formData.contactName, "contactName")}
+            {renderInput("Phone Number", "Enter number", formData.phone, "phone")}
+          </>
         );
       case "Event":
         return (
-          <div className="event-inputs">
-            <label>
-              Event Title:
-              <input
-                type="text"
-                placeholder="Event Title"
-                value={formData.title || ""}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            </label>
-            <label>
-              Location:
-              <input
-                type="text"
-                placeholder="Location"
-                value={formData.location || ""}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              />
-            </label>
-            <label>
-              Start (DD/MM/YYYY):
-              <input
-                type="text"
-                placeholder="Start Date"
-                value={formData.start || ""}
-                onChange={(e) => setFormData({ ...formData, start: e.target.value })}
-              />
-            </label>
-            <label>
-              End (DD/MM/YYYY):
-              <input
-                type="text"
-                placeholder="End Date"
-                value={formData.end || ""}
-                onChange={(e) => setFormData({ ...formData, end: e.target.value })}
-              />
-            </label>
-            <label>
-              Description:
-              <textarea
-                placeholder="Description"
-                value={formData.description || ""}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </label>
-          </div>
+          <>
+            {renderInput("Event Title", "Enter title", formData.title, "title")}
+            {renderInput("Location", "Enter location", formData.location, "location")}
+            {renderInput("Start Date (DD/MM/YYYY)", "", formData.start, "start")}
+            {renderInput("End Date (DD/MM/YYYY)", "", formData.end, "end")}
+            {renderTextarea("Description", "Event description", formData.description, "description")}
+          </>
         );
       default:
-        return (
-          <div className="default-input">
-            <label>
-              {qrType} Data:
-              <input
-                type="text"
-                placeholder={`Enter ${qrType} data`}
-                value={formData.data || ""}
-                onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-              />
-            </label>
-          </div>
-        );
+        return renderInput(`${qrType} Data`, `Enter ${qrType} data`, formData.data, "data");
     }
   };
 
   return (
     <>
-      <Navbar/>
-      <div className="qr-generator">
-      <div className="qr-container">
-        {/* Left Panel: 2x3 Grid of Types and Dynamic Input Fields */}
-        <div className="left-panel">
-          <div className="qr-types-grid">
-            {qrTypes.map((type) => (
-              <button
-                key={type}
-                className={qrType === type ? "active" : ""}
-                onClick={() => {
-                  setQrType(type);
-                  setFormData({});
-                  setErrorMessage("");
-                }}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-          <div className="qr-input-group">
-            {renderInputFields()}
-            {errorMessage && (
-              <div style={{ color: "red", marginBottom: "10px" }}>
-                {errorMessage}
-              </div>
-            )}
-            <button onClick={downloadQRCode}>Download QR</button>
-          </div>
-        </div>
-        {/* Right Panel: Phone Display */}
-        <div className="phone-display">
-          <div className="phone-frame">
-            <div className="phone-screen" ref={qrRef}>
-              <QRCodeCanvas value={getQRValue()} size={150} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <Footer/>
+      <Navbar />
+      <motion.div className="container py-5">
+        <Row className="justify-content-center">
+          {/* Left - Options */}
+          <Col xs={12} md={6} lg={5} className="mb-4">
+            <Card className="rounded-4 shadow-lg border-0 p-4 bg-light">
+              <Card.Body>
+                <h2 className="text-center mb-5 text-primary">Create Your QR Code</h2>
+                <Row className="mb-4">
+                  {qrTypes.map((type) => (
+                    <Col xs={6} sm={4} md={3} key={type} className="mb-2">
+                      <Button
+                        variant={qrType === type ? "primary" : "outline-primary"}
+                        onClick={() => {
+                          setQrType(type);
+                          setFormData({});
+                          setErrorMessage("");
+                          setShowQR(false);
+                        }}
+                        className="w-100 py-2"
+                      >
+                        {type}
+                      </Button>
+                    </Col>
+                  ))}
+                </Row>
+                {renderInputFields()}
+                {errorMessage && <Alert variant="danger" className="mt-3">{errorMessage}</Alert>}
+                <Button className="w-100 mt-4 py-3" onClick={handleCreateQRCode}>
+                  Generate QR
+                </Button>
+                <Button className="w-100 mt-4 py-3" variant="outline-dark" onClick={() => navigate("/dashboard")}>
+                  <ArrowLeftCircle className="me-2" size={18} />
+                  Go back to Dashboard
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+
+          {/* Right - Preview */}
+          <Col xs={12} md={6} lg={5} className="d-flex align-items-center justify-content-center">
+            <motion.div
+              className="qr-preview w-100 text-center"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              style={{
+                minHeight: "300px",
+                backgroundColor: "#f8fafc",
+                borderRadius: "16px",
+                padding: "2rem",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+              }}
+            >
+              {loading ? (
+                <Spinner animation="border" variant="primary" />
+              ) : showQR ? (
+                <QRCodeCanvas
+                  value={getQRValue()}
+                  size={256}
+                  bgColor={"#ffffff"}
+                  fgColor={"#333"}
+                  level="H"
+                  renderAs="canvas"
+                />
+              ) : (
+                <div className="text-muted">
+                  <p className="fw-bold">QR Code Preview</p>
+                  <p>Your QR code will appear here once generated.</p>
+                </div>
+              )}
+            </motion.div>
+          </Col>
+        </Row>
+      </motion.div>
+      <ToastContainer position="bottom-end" className="p-4">
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={5000}
+          autohide
+          bg="info"
+        >
+          <Toast.Header closeButton={false}>
+            <strong className="me-auto">Redirecting...</strong>
+          </Toast.Header>
+          <Toast.Body className="text-white">
+            You will be redirected to the success page in 5 seconds.
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+
+      <Footer />
     </>
-    
   );
 };
 
