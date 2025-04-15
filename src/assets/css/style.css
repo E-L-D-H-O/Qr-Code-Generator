@@ -31,18 +31,10 @@
 }
 
 
-footer {
-    background: #343a40;
-    color: white;
-    padding: 10px 0;
-    position: relative;
-}
 
 .card img {
-    border: 8px solid #ddd;
     padding: 10px;
     background: #fff;
-    border-radius: 10px;
 }
 
 
@@ -75,8 +67,6 @@ footer {
     font-size: 3rem;
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     font-weight: 800;
 }
 
@@ -285,141 +275,6 @@ footer {
     font-size: 0.9rem;
 }
 
-.pricing {
-    padding: 4rem 2rem;
-    background-color: white;
-}
-
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.pricing-card {
-    background-color: var(--light);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.pricing-card.popular::before {
-    content: "Most Popular";
-    position: absolute;
-    top: 15px;
-    right: -30px;
-    background-color: var(--accent);
-    color: white;
-    padding: 5px 40px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    transform: rotate(45deg);
-}
-
-.pricing-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.pricing-card h3 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    color: var(--dark);
-}
-
-.pricing-price {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: var(--primary);
-}
-
-.pricing-price span {
-    font-size: 1rem;
-    font-weight: 400;
-    color: #777;
-}
-
-.pricing-features {
-    list-style: none;
-    margin-bottom: 2rem;
-}
-
-.pricing-features li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-}
-
-.pricing-features li:last-child {
-    border-bottom: none;
-}
-
-footer {
-    background-color: var(--dark);
-    color: white;
-    padding: 3rem 2rem;
-}
-
-.footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-column h3 {
-    font-size: 1.2rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    padding-bottom: 0.5rem;
-}
-
-.footer-column h3::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 2px;
-    background-color: var(--primary);
-}
-
-.footer-column ul {
-    list-style: none;
-}
-
-.footer-column li {
-    margin-bottom: 0.8rem;
-}
-
-.footer-column a {
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.footer-column a:hover {
-    color: white;
-    padding-left: 5px;
-}
-
-.footer-bottom {
-    text-align: center;
-    padding-top: 2rem;
-    margin-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-
 
 @media (max-width: 768px) {
     .hero {
@@ -449,62 +304,4 @@ footer {
         font-size: 1.5rem;
         cursor: pointer;
     }
-}
-
-
-
-/* dashboard css */
-
-
-.qr-container {
-    margin-top: 30px;
-}
-
-.qr-card {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    padding: 20px;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    text-align: center;
-}
-
-.qr-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-}
-
-.qr-preview-img img {
-    width: 100%;
-    max-width: 160px;
-    border-radius: 10px;
-    padding: 12px;
-    background: white;
-    transition: transform 0.3s ease-in-out;
-}
-
-.qr-card:hover .qr-preview img {
-    transform: scale(1.05);
-}
-
-.btn-3d {
-    background: linear-gradient(145deg, #ff416c, #ff4b2b);
-    color: white;
-    border: none;
-    box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
-    transition: all 0.3s ease-in-out;
-    margin-top: 10px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 50px;
-}
-
-.btn-3d:hover {
-    transform: scale(1.08);
-    box-shadow: 0 8px 25px rgba(255, 75, 43, 0.5);
-}
-
-.btn-3d i {
-    margin-right: 5px;
 }
