@@ -4,5 +4,12 @@ export const RENDER_PATH = {
     SIGN_UP_URL: "/signup",
     CREATE_QR_URL: "/createqr",
     DASHBOARD: "/dashboard",
-    SUCCESS: "/success"
+    SUCCESS: "/success",
+    DONATE: "/create-checkout-session",
+    PAYMENT_SUCCESS: "/payment-success",
+    PAYMENT_CANCEL: "/payment-cancel"
+}
+
+export const API_URL = {
+    BASE_URL: 'http://localhost:5000',
 }
