@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import "../assets/css/style.css";
+import { API_URL } from "../common/constants";
 
 const LoginContainer = () => {
     const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const LoginContainer = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:5000/login", {
+            const response = await fetch(`${API_URL.BASE_URL}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -35,7 +36,6 @@ const LoginContainer = () => {
             if (response.ok) {
                 setMessage("✅ Login successful!");
 
-                // Store user data & token in localStorage
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify({ firstName: data.firstName, email: formData.email }));
 
@@ -54,40 +54,43 @@ const LoginContainer = () => {
             <Navbar />
             <div className="container py-5">
                 <div className="row justify-content-center">
-                    <div className="col-md-8 col-lg-6">
-                        <div className="card shadow-lg">
+                    <div className="col-md-8 col-lg-5">
+                        <div className="card shadow rounded-4 border-0">
                             <div className="card-body p-5">
-                                <h2 className="card-title text-center mb-4">Login</h2>
-                                {message && <p className="alert alert-info">{message}</p>}
+                                <h2 className="card-title text-center mb-4 fw-bold">Welcome Back 👋</h2>
+                                <p className="text-center text-muted mb-4">Login to your account to continue</p>
+                                {message && <p className="alert alert-info text-center fw-semibold">{message}</p>}
                                 <form onSubmit={handleSubmit}>
-                                    <div className="mb-3">
-                                        <label htmlFor="email" className="form-label">Email</label>
+                                    <div className="mb-4">
+                                        <label htmlFor="email" className="form-label fw-semibold">Email Address</label>
                                         <input
                                             type="email"
-                                            className="form-control"
+                                            className="form-control rounded-3 p-3"
                                             id="email"
                                             name="email"
                                             required
                                             value={formData.email}
                                             onChange={handleChange}
+                                            placeholder="you@example.com"
                                         />
                                     </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="password" className="form-label">Password</label>
+                                    <div className="mb-4">
+                                        <label htmlFor="password" className="form-label fw-semibold">Password</label>
                                         <input
                                             type="password"
-                                            className="form-control"
+                                            className="form-control rounded-3 p-3"
                                             id="password"
                                             name="password"
                                             required
                                             value={formData.password}
                                             onChange={handleChange}
+                                            placeholder="Enter your password"
                                         />
                                     </div>
-                                    <button type="submit" className="btn btn-primary w-100">Login</button>
+                                    <button type="submit" className="btn btn-primary w-100 py-3 fw-semibold rounded-3">Login</button>
                                 </form>
-                                <div className="text-center mt-3">
-                                    <span>Don't have an account? <a href="/signup" className="text-primary">Sign up here</a></span>
+                                <div className="text-center mt-4">
+                                    <span className="text-muted">Don't have an account? <a href="/signup" className="text-decoration-none text-primary fw-medium">Sign up here</a></span>
                                 </div>
                             </div>
                         </div>
